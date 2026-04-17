@@ -1,7 +1,5 @@
 // const API_BASE = 'https://crepianobot.runasp.net/api';
 
-// const API_BASE = '/api'; // Proxy to backend in development
-
 const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 export const api = {
