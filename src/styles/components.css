@@ -1,0 +1,78 @@
+/* Header */
+.header {
+  background: var(--surface-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 14px 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo-placeholder {
+  width: 200px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-placeholder img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Footer */
+.footer {
+  background: var(--surface-color);
+  text-align: center;
+  padding: 24px 1rem 10px;
+  font-size: 12px;
+  color: var(--text-hint);
+  border-top: 1px solid var(--border-color);
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-social {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.footer-social a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 18px;
+  transition: color 0.15s;
+}
+
+.footer-social a:hover {
+  color: var(--main-color);
+}
+
+.footer-copy {
+  font-size: 11px;
+  color: var(--text-hint);
+}
+
+.footer-dev {
+  font-size: 11px;
+  color: var(--text-hint);
+}
+
+.footer-dev a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer-dev a:hover {
+  color: var(--main-color);
+}

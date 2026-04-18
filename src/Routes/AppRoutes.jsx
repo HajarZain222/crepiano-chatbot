@@ -5,9 +5,10 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 // Pages
-import Confirm from '../pages/Confirm';
-import Menu from '../pages/Menu';
+import Browse from '../pages/Browse';
 import Order from '../pages/Order';
+import Menu from '../pages/Menu';
+import Confirm from '../pages/Confirm';
 
 export default function AppRoutes() {
   return (
@@ -15,7 +16,8 @@ export default function AppRoutes() {
       <Navbar />
       <main>
         <Routes>
-          <Route path="/" element={<Menu />} />  
+          <Route path="/" element={<Browse />} />  
+          <Route path="/menu" element={<Menu />} />  
           <Route path="/order" element={<Order />} />
           <Route path="/confirm" element={<Confirm />} />
         </Routes>

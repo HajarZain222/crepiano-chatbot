@@ -153,7 +153,7 @@ function CartBar({ cart, onClick }) {
   return (
     <div className="cart-bar" onClick={onClick} role="button" tabIndex={0} onKeyDown={(e) => e.key === "Enter" && onClick()}>
       <span className="cart-count">{count} {count === 1 ? "صنف" : "أصناف"}</span>
-      <span className="cart-total">اطلب الآن — {total} ج</span>
+      <span className="cart-total">تأكيد الطلب — {total} ج</span>
     </div>
   );
 }
@@ -224,7 +224,7 @@ function Menu() {
     const items = Object.values(cart);
     if (!items.length) return;
     sessionStorage.setItem("cartData", JSON.stringify(items));
-    navigate("/order");
+    navigate("/confirm");
   }
 
   return (

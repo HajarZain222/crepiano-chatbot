@@ -150,7 +150,7 @@ function Confirm() {
           {loading ? "جاري الإرسال..." : "تأكيد الطلب"}
         </button>
 
-        <button className="back-btn" onClick={() => navigate("/order")}>
+        <button className="back-btn" onClick={() => navigate("/menu")}>
           تعديل الطلب
         </button>
 
