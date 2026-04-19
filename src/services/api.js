@@ -23,5 +23,11 @@ export const api = {
         });
         if (!res.ok) throw new Error('فشل إرسال الطلب');
         return res.json();
+    },
+
+    async getCustomer(phone) {
+        const res = await fetch(`${API_BASE}/customer?phone=${phone}`);
+        if (!res.ok) return null;
+        return res.json();
     }
 };

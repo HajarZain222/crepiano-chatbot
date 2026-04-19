@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 /* ─── Branch Option ──────────────────────────── */
-
 function BranchOption({ branch, selected, onSelect }) {
   return (
     <label className={`branch-option${selected ? " selected" : ""}`}>
@@ -28,7 +27,6 @@ function BranchOption({ branch, selected, onSelect }) {
 }
 
 /* ─── Order Page ─────────────────────────────── */
-
 function Order() {
   const navigate = useNavigate();
 
@@ -41,7 +39,9 @@ function Order() {
   const [branchStatus, setBranchStatus]         = useState("loading");
   const [selectedBranchId, setSelectedBranchId] = useState(null);
   const [errors, setErrors]                     = useState({});
+  const [isPhoneLocked, setIsPhoneLocked]       = useState(false);
 
+  /* ─── تحميل الفروع ─────────────────────────── */
   useEffect(() => {
     api
       .getBranches()
@@ -52,19 +52,49 @@ function Order() {
       .catch(() => setBranchStatus("error"));
   }, []);
 
+  /* ─── قراءة رقم الهاتف من URL + جلب بيانات العميل ─────────────────────────── */
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    let phoneFromUrl = params.get("phone");
+
+    if (phoneFromUrl) {
+      // تنظيف الرقم (لو جه من الواتساب فيه @lid أو @s.whatsapp)
+      phoneFromUrl = phoneFromUrl.split("@")[0];
+
+      setPhone(phoneFromUrl);
+      setIsPhoneLocked(true);
+
+      api.getCustomer(phoneFromUrl)
+        .then((data) => {
+          if (data) {
+            setName(data.name || "");
+            setAdditionalPhone(data.additionalPhone || "");
+            setAddress(data.address || "");
+          }
+        })
+        .catch(() => {});
+    }
+  }, []);
+
+  /* ─── Validation ─────────────────────────── */
   function validate() {
     const e = {};
-    if (!name.trim())            e.name           = "الاسم مطلوب.";
-    if (!phone.trim())           e.phone          = "رقم الهاتف مطلوب.";
+    if (!name.trim())            e.name            = "الاسم مطلوب.";
+    if (!phone.trim())           e.phone           = "رقم الهاتف مطلوب.";
     if (!additionalPhone.trim()) e.additionalPhone = "الرقم الإضافي مطلوب.";
-    if (orderType === "delivery" && !address.trim()) e.address = "العنوان مطلوب للتوصيل.";
-    if (orderType === "pickup"   && !selectedBranchId) e.branch = "اختر فرعاً.";
+    if (orderType === "delivery" && !address.trim())
+      e.address = "العنوان مطلوب للتوصيل.";
+    if (orderType === "pickup" && !selectedBranchId)
+      e.branch = "اختر فرعاً.";
+
     setErrors(e);
     return !Object.keys(e).length;
   }
 
+  /* ─── Submit ─────────────────────────── */
   function handleConfirm() {
     if (!validate()) return;
+
     const orderData = {
       name:            name.trim(),
       phone:           phone.trim(),
@@ -74,6 +104,7 @@ function Order() {
       branchId:        orderType === "pickup"   ? selectedBranchId : null,
       notes:           null,
     };
+
     sessionStorage.setItem("orderData", JSON.stringify(orderData));
     navigate("/menu");
   }
@@ -90,7 +121,7 @@ function Order() {
 
         <div className="order-layout">
 
-          {/* ── Right column: personal info ── */}
+          {/* ── بيانات المستخدم ── */}
           <div className="order-col">
             <div className="card">
               <h2>بياناتك</h2>
@@ -98,7 +129,9 @@ function Order() {
               <div className="form-group">
                 <label htmlFor="name">الاسم</label>
                 <input
-                  id="name" type="text" value={name}
+                  id="name"
+                  type="text"
+                  value={name}
                   placeholder="مثال: محمد أمجد"
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -108,8 +141,11 @@ function Order() {
               <div className="form-group">
                 <label htmlFor="phone">رقم الهاتف</label>
                 <input
-                  id="phone" type="tel" value={phone}
+                  id="phone"
+                  type="tel"
+                  value={phone}
                   placeholder="01XXXXXXXXX"
+                  disabled={isPhoneLocked}
                   onChange={(e) => setPhone(e.target.value)}
                 />
                 {errors.phone && <span className="error">{errors.phone}</span>}
@@ -118,7 +154,9 @@ function Order() {
               <div className="form-group">
                 <label htmlFor="additionalPhone">رقم إضافي</label>
                 <input
-                  id="additionalPhone" type="tel" value={additionalPhone}
+                  id="additionalPhone"
+                  type="tel"
+                  value={additionalPhone}
                   placeholder="01XXXXXXXXX"
                   onChange={(e) => setAdditionalPhone(e.target.value)}
                 />
@@ -129,7 +167,7 @@ function Order() {
             </div>
           </div>
 
-          {/* ── Left column: delivery method ── */}
+          {/* ── نوع الطلب ── */}
           <aside className="order-sidebar">
             <div className="card">
               <h2>طريقة الاستلام</h2>
@@ -142,6 +180,7 @@ function Order() {
                 >
                   توصيل
                 </button>
+
                 <button
                   type="button"
                   className={`type-btn${orderType === "pickup" ? " active" : ""}`}
@@ -155,7 +194,9 @@ function Order() {
                 <div className="form-group">
                   <label htmlFor="address">العنوان</label>
                   <input
-                    id="address" type="text" value={address}
+                    id="address"
+                    type="text"
+                    value={address}
                     placeholder="الشارع، المنطقة، المدينة"
                     onChange={(e) => setAddress(e.target.value)}
                   />
@@ -165,28 +206,37 @@ function Order() {
 
               {orderType === "pickup" && (
                 <div className="branch-list">
-                  {branchStatus === "loading" && <div className="loading">جاري تحميل الفروع...</div>}
-                  {branchStatus === "error"   && <div className="loading">تعذر تحميل الفروع.</div>}
-                  {branchStatus === "ready"   && branches.map((branch) => (
-                    <BranchOption
-                      key={branch.id}
-                      branch={branch}
-                      selected={selectedBranchId === branch.id}
-                      onSelect={(id) => {
-                        setSelectedBranchId(id);
-                        setErrors((p) => ({ ...p, branch: "" }));
-                      }}
-                    />
-                  ))}
-                  {errors.branch && <span className="error">{errors.branch}</span>}
+                  {branchStatus === "loading" && (
+                    <div className="loading">جاري تحميل الفروع...</div>
+                  )}
+
+                  {branchStatus === "error" && (
+                    <div className="loading">تعذر تحميل الفروع.</div>
+                  )}
+
+                  {branchStatus === "ready" &&
+                    branches.map((branch) => (
+                      <BranchOption
+                        key={branch.id}
+                        branch={branch}
+                        selected={selectedBranchId === branch.id}
+                        onSelect={(id) => {
+                          setSelectedBranchId(id);
+                          setErrors((p) => ({ ...p, branch: "" }));
+                        }}
+                      />
+                    ))}
+
+                  {errors.branch && (
+                    <span className="error">{errors.branch}</span>
+                  )}
                 </div>
               )}
             </div>
           </aside>
-
         </div>
 
-        {/* ── CTA: styled exactly like cart-bar ── */}
+        {/* زر المتابعة */}
         <div
           className="cart-bar"
           role="button"
