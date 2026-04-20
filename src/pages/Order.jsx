@@ -53,28 +53,49 @@ function Order() {
   }, []);
 
   /* ─── قراءة رقم الهاتف من URL + جلب بيانات العميل ─────────────────────────── */
-  useEffect(() => {
+  // useEffect(() => {
+  //   const params = new URLSearchParams(window.location.search);
+  //   let phoneFromUrl = params.get("phone");
+
+  //   if (phoneFromUrl) {
+  //     // تنظيف الرقم (لو جه من الواتساب فيه @lid أو @s.whatsapp)
+  //     phoneFromUrl = phoneFromUrl.split("@")[0];
+
+  //     setPhone(phoneFromUrl);
+  //     setIsPhoneLocked(true);
+
+  //     api.getCustomer(phoneFromUrl)
+  //       .then((data) => {
+  //         if (data) {
+  //           setName(data.name || "");
+  //           setAdditionalPhone(data.additionalPhone || "");
+  //           setAddress(data.address || "");
+  //         }
+  //       })
+  //       .catch(() => {});
+  //   }
+  // }, []);
+useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    let phoneFromUrl = params.get("phone");
+    const jidFromUrl = params.get("jid");
 
-    if (phoneFromUrl) {
-      // تنظيف الرقم (لو جه من الواتساب فيه @lid أو @s.whatsapp)
-      phoneFromUrl = phoneFromUrl.split("@")[0];
+    if (jidFromUrl) {
+        // *** هنا برّا أي حاجة تانية ***
+        sessionStorage.setItem("customerJid", jidFromUrl);
+        console.log("JID saved:", jidFromUrl);
 
-      setPhone(phoneFromUrl);
-      setIsPhoneLocked(true);
-
-      api.getCustomer(phoneFromUrl)
-        .then((data) => {
-          if (data) {
-            setName(data.name || "");
-            setAdditionalPhone(data.additionalPhone || "");
-            setAddress(data.address || "");
-          }
-        })
-        .catch(() => {});
+        api.getCustomer(jidFromUrl)
+            .then((data) => {
+                if (data) {
+                    setName(data.name || "");
+                    setPhone(data.phone || "");
+                    setAdditionalPhone(data.additionalPhone || "");
+                    setAddress(data.address || "");
+                }
+            })
+            .catch(() => {});
     }
-  }, []);
+}, []);
 
   /* ─── Validation ─────────────────────────── */
   function validate() {

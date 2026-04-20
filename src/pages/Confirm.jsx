@@ -30,9 +30,22 @@ function Confirm() {
     setLoading(true);
     setError(null);
 
+    // const payload = {
+    //   customerName: orderData.name,
+    //   customerPhone: orderData.phone,
+    //   customerAdditionalPhone: orderData.additionalPhone,
+    //   type: orderData.type === "delivery" ? 0 : 1,
+    //   address: orderData.address || null,
+    //   notes: orderData.notes || null,
+    //   branchId: orderData.branchId || null,
+    //   items: cartData.map((i) => ({ menuItemId: i.id, quantity: i.qty })),
+    // };
+    const jid = sessionStorage.getItem("customerJid");
+
     const payload = {
       customerName: orderData.name,
       customerPhone: orderData.phone,
+      customerJid: jid || null,
       customerAdditionalPhone: orderData.additionalPhone,
       type: orderData.type === "delivery" ? 0 : 1,
       address: orderData.address || null,
